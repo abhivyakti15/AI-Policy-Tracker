@@ -175,7 +175,7 @@ def main():
    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
    parser.add_argument("--api-key", default="b09703ce22f64473b9791508a66765f2",
                     help="NewsAPI key")
-   parser.add_argument("--days", type=int, default=30,
+   parser.add_argument("--days", type=int, default=90,
                         help="How many days back to search (free tier caps this at ~30)")
    parser.add_argument("--page-size", type=int, default=50, help="Max articles per state query (NewsAPI max 100)")
    parser.add_argument("--states", nargs="*", default=list(STATES.keys()),
