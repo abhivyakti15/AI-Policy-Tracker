@@ -1,4 +1,4 @@
-const AI_POLICY_RECORDS = [
+window.AI_POLICY_RECORDS = [
     {
         "id": "AUTO-001",
         "state": "Karnataka",

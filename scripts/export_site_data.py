@@ -9,7 +9,7 @@ CSV_PATH = os.path.join(ROOT, "data", "ai_policy_india.csv")
 def write_data_js(rows, out_path):
     os.makedirs(os.path.dirname(out_path), exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
-        f.write("const AI_POLICY_RECORDS =" + json.dumps(rows, indent=2, ensure_ascii=False) + ";\n")
+        f.write("window.AI_POLICY_RECORDS = " + json.dumps(rows, indent=2, ensure_ascii=False) + ";\n")
     print(f"Wrote {out_path} with {len(rows)} records.")
 
 def main():
