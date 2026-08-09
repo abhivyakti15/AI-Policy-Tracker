@@ -8,7 +8,7 @@ policing, education), state budget lines for AI, and regulatory/ethics moves.
 
 **Dataset:** [`data/ai_policy_india.csv`](data/ai_policy_india.csv)
 
-**Dashboard:** <https://abhivyakti15.github.io/AI-Policy-Tracker/site/index.html>
+**Dashboard:** <https://abhivyakti15.github.io/AI-Policy-Tracker/site/dashboard.html>
 
 ---
 
