@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>State of AI &mdash; India's State-Level AI Policy Tracker</title>
+    <meta name="description"
+        content="A tracker of AI policy activity across Indian states: missions, MoUs, budgets, deployments and regulation.">
+    <style>
+        :root {
+            --paper: #F5F1E7;
+            --paper-raised: #FBF9F3;
+            --ink: #1E2440;
+            --ink-soft: #4A5170;
+            --rule: #D8D0BC;
+            --marigold: #D9932C;
+            --marigold-deep: #B5741A;
+            --maroon: #8C3B3B;
+            --indigo: #28345C;
+            --teal: #3D6E63;
+            --stamp: #C0392B;
+            --focus: #1E2440;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            margin: 0;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+            line-height: 1.5;
+        }
+
+        ::selection {
+            background: var(--marigold);
+            color: var(--ink);
+        }
+
+        .mono {
+            font-family: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+        }
+
+
+        a {
+            color: var(--indigo);
+        }
+
+        a:hover {
+            color: var(--marigold-deep);
+        }
+
+
+        /* ---------- Header / masthead ---------- */
+        header.masthead {
+            border-bottom: 3px double var(--ink);
+            padding: 2.25rem 1.5rem 1.5rem;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .masthead-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            gap: 1rem;
+            flex-wrap: wrap;
+            font-family: "IBM Plex Mono", monospace;
+            font-size: .72rem;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--ink-soft);
+            margin-bottom: .9rem;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 5vw, 3.1rem);
+            margin: .1rem 0 .35rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+
+        h1 .accent {
+            color: var(--stamp);
+            font-style: italic;
+        }
+
+        .dek {
+            font-size: 1.05rem;
+            color: var(--ink-soft);
+            max-width: 62ch;
+            margin: 0 0 1.4rem;
+        }
+
+        .stat-strip {
+            display: flex;
+            gap: 0;
+            flex-wrap: wrap;
+            border-top: 1px solid var(--rule);
+            border-bottom: 1px solid var(--rule);
+        }
+
+        .stat {
+            flex: 1 1 140px;
+            padding: .75rem 1rem;
+            border-right: 1px solid var(--rule);
+        }
+
+        .stat:last-child {
+            border-right: none;
+        }
+
+        .stat .n {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--indigo);
+        }
+
+        .stat .l {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: .65rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--ink-soft);
+        }
+
+
+        main {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+
+        /* ---------- Chart ---------- */
+        .chart-block {
+            margin: 1.75rem 0 2.25rem;
+        }
+
+        .chart-title {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: .7rem;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--ink-soft);
+            margin-bottom: .6rem;
+        }
+
+        .bars {
+            display: flex;
+            flex-direction: column;
+            gap: .4rem;
+        }
+
+        .bar-row {
+            display: grid;
+            grid-template-columns: 120px 1fr 2.4rem;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .bar-label {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: .78rem;
+            color: var(--ink);
+        }
+
+        .bar-track {
+            background: var(--paper-raised);
+            border: 1px solid var(--rule);
+            height: 16px;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--marigold-deep), var(--marigold));
+            transition: width .5s ease;
+        }
+
+        .bar-count {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: .75rem;
+            color: var(--ink-soft);
+            text-align: right;
+        }
+
+
+        /* ---------- Filters ---------- */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            padding: 1rem 1.1rem;
+            background: var(--paper-raised);
+            border: 1px solid var(--rule);
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-group {
+            flex: 1 1 220px;
+        }
+
+        .filter-group h3 {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: .68rem;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            color: var(--ink-soft);
+            margin: 0 0 .5rem;
+        }
+
+        .chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: .4rem;
+        }
+
+        .chip {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: .72rem;
+            padding: .3rem .6rem;
+            border: 1px solid var(--rule);
+            background: var(--paper);
+            cursor: pointer;
+            color: var(--ink-soft);
+            user-select: none;
+        }
+
+        .chip:hover {
+            border-color: var(--ink-soft);
+        }
+
+        .chip.active {
+            background: var(--ink);
+            color: var(--paper);
+            border-color: var(--ink);
+        }
+
+        .search-box {
+            width: 100%;
+            padding: .5rem .6rem;
+            font-family: "IBM Plex Mono", monospace;
+            font-size: .8rem;
+            border: 1px solid var(--rule);
+            background: var(--paper);
+            color: var(--ink);
+        }
+
+        .search-box:focus {
+            outline: 2px solid var(--focus);
+            outline-offset: 1px;
+        }
+
+
+        .view-toggle {
+            display: flex;
+            gap: .4rem;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .view-toggle button {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            padding: .4rem .8rem;
+            border: 1px solid var(--ink);
+            background: var(--paper);
+            color: var(--ink);
+            cursor: pointer;
+        }
+
+        .view-toggle button.active {
+            background: var(--ink);
+            color: var(--paper);
+        }
+
+        .result-count {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: .72rem;
+            color: var(--ink-soft);
+            margin-left: auto;
+        }
+
+
+        /* ---------- Cards / timeline ---------- */
+        #results {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .card {
+            background: var(--paper-raised);
+            border: 1px solid var(--rule);
+            border-left: 5px solid var(--indigo);
+            padding: 1.1rem 1.3rem;
+            position: relative;
+        }
+
+        .card[data-cat="Policy / Strategy"] {
+            border-left-color: var(--indigo);
+        }
+
+        .card[data-cat="Institutional Setup"] {
+            border-left-color: var(--teal);
+        }
+
+        .card[data-cat="Industry / Academia MoU"] {
+            border-left-color: var(--marigold-deep);
+        }
+
+        .card[data-cat="Governance Deployment"] {
+            border-left-color: var(--stamp);
+        }
+
+        .card[data-cat="Budget & Funding"] {
+            border-left-color: #5B4636;
+        }
+
+        .card[data-cat="Regulatory / Ethics"] {
+            border-left-color: var(--maroon);
+        }
+
+        .card[data-cat="Skilling / Workforce"] {
+            border-left-color: #6B5B95;
+        }
+
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            align-items: flex-start;
+            flex-wrap: wrap;
+        }
+
+        .card-meta {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: .7rem;
+            color: var(--ink-soft);
+            display: flex;
+            gap: .6rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .state-badge {
+            font-family: "IBM Plex Mono", monospace;
+            font-weight: 700;
+            font-size: .7rem;
+            padding: .15rem .45rem;
+            background: var(--ink);
+            color: var(--paper);
+            letter-spacing: .04em;
+        }
+
+        .cat-tag {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: .68rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+            color: var(--ink-soft);
+        }
+
+        .card h2 {
+            font-size: 1.15rem;
+            margin: .5rem 0 .4rem;
+            font-weight: 700;
+            line-height: 1.35;
+        }
+
+        .summary {
+            margin: 0 0 .55rem;
+            color: var(--ink);
+        }
+
+        .card-foot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: .5rem;
+            font-family: "IBM Plex Mono", monospace;
+            font-size: .72rem;
+            color: var(--ink-soft);
+            border-top: 1px dashed var(--rule);
+            padding-top: .55rem;
+            margin-top: .4rem;
+        }
+
+        .entities {
+            font-style: italic;
+            color: var(--ink-soft);
+        }
+
+        details.notes {
+            margin-top: .5rem;
+            font-size: .8rem;
+            color: var(--ink-soft);
+        }
+
+        details.notes summary {
+            cursor: pointer;
+            font-family: "IBM Plex Mono", monospace;
+            font-size: .68rem;
+            text-transform: uppercase;
+            letter-spacing: .05em;
+        }
+
+        details.notes p {
+            margin: .4rem 0 0;
+        }
+
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--ink-soft);
+            font-family: "IBM Plex Mono", monospace;
+            font-size: .85rem;
+        }
+
+
+        /* ---------- Table view ---------- */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .82rem;
+        }
+
+        table th,
+        table td {
+            text-align: left;
+            padding: .5rem .6rem;
+            border-bottom: 1px solid var(--rule);
+            vertical-align: top;
+        }
+
+        table th {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: .65rem;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            color: var(--ink-soft);
+            border-bottom: 2px solid var(--ink);
+        }
+
+        table tr:hover {
+            background: var(--paper-raised);
+        }
+
+
+        footer {
+            max-width: 1100px;
+            margin: 2.5rem auto 3rem;
+            padding: 1.5rem 1.5rem 0;
+            border-top: 3px double var(--ink);
+            font-size: .88rem;
+            color: var(--ink-soft);
+        }
+
+        footer h3 {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: .72rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--ink);
+        }
+
+        footer .cols {
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        footer .col {
+            flex: 1 1 260px;
+        }
+
+        footer p {
+            margin: .4rem 0;
+        }
+
+
+        @media (max-width: 640px) {
+            .bar-row {
+                grid-template-columns: 80px 1fr 2rem;
+            }
+
+            header.masthead {
+                padding: 1.5rem 1rem 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <header class="masthead">
+        <div class="masthead-top">
+            <span>Gazette of Emerging Technology &middot; Vol. I</span>
+            <span id="today"></span>
+        </div>
+        <h1>State of <span class="accent">AI</span></h1>
+        <p class="dek">A tracker of AI policy activity across Indian states &mdash; missions, task forces, MoUs, budget
+            lines, ethics frameworks, and AI put to work in health, agriculture, policing and education. Six states
+            covered closely; two more spot-checked.</p>
+        <div class="stat-strip" id="statStrip"></div>
+    </header>
+
+
+    <main>
+
+
+        <div class="chart-block">
+            <div class="chart-title">Records by state</div>
+            <div class="bars" id="stateBars"></div>
+        </div>
+
+
+        <div class="filters">
+            <div class="filter-group">
+                <h3>State</h3>
+                <div class="chips" id="stateChips"></div>
+            </div>
+            <div class="filter-group">
+                <h3>Category</h3>
+                <div class="chips" id="catChips"></div>
+            </div>
+            <div class="filter-group" style="flex-basis:100%;">
+                <h3>Search</h3>
+                <input type="text" class="search-box" id="searchBox"
+                    placeholder="Search headlines, summaries, entities&hellip;">
+            </div>
+        </div>
+
+
+        <div class="view-toggle">
+            <button id="btnTimeline" class="active">Timeline</button>
+            <button id="btnTable">Table</button>
+            <span class="result-count" id="resultCount"></span>
+        </div>
+
+
+        <div id="results"></div>
+        <div id="tableWrap" style="display:none; overflow-x:auto;"></div>
+
+
+    </main>
+
+
+    <footer>
+        <div class="cols">
+            <div class="col">
+                <h3>What counts as "AI policy activity"</h3>
+                <p>We include: state AI policies/missions/roadmaps; task forces, centres of excellence, AI cities or
+                    advisory councils; MoUs with companies or universities for AI; AI actually deployed in governance
+                    (health, agriculture, policing, education, citizen services); state budget lines for AI; and
+                    regulatory/ethics frameworks. We exclude AI mentioned only as a buzzword in unrelated announcements,
+                    private-sector-only AI news with no state government role, and national/central-government-only
+                    initiatives (e.g. IndiaAI Mission itself) unless a state is a clear active party.</p>
+            </div>
+            <div class="col">
+                <h3>Coverage &amp; caveats</h3>
+                <p>23 records, 8 states, prioritised for depth over breadth (see README/RATIONALE in the repo). Dates
+                    are ISO where a source gave one; where sources only gave a month or year, we mark <code
+                        class="mono">date_precision</code> instead of guessing a day. Duplicate coverage of the same
+                    announcement across outlets was collapsed to one canonical record.</p>
+            </div>
+            <div class="col">
+                <h3>Source &amp; code</h3>
+                <p>Dataset: <code class="mono">data/ai_policy_india.csv</code>. Full methodology: <code
+                        class="mono">RATIONALE.md</code> and <code class="mono">README.md</code> in the repository.</p>
+                <p>This is a research/demo tracker, not an authoritative government record &mdash; verify against
+                    primary sources before citing.</p>
+            </div>
+        </div>
+    </footer>
+
+
+    <script src="data.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
