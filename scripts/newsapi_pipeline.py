@@ -31,11 +31,29 @@ STATES = {
     "Goa":    {"code": "GA", "aliases": ["Goa"]}
 }
 
-AI_TERMS = ["artificial intelligence", "\"AI\" policy", "AI mission", "AI city"]
+AI_TERMS = [
+    "artificial intelligence", "\"AI\" policy", "AI mission", "AI city",
+    "machine learning", "ml", "genai", "generative ai", "ai-driven", "ai powered",
+]
 POLICY_TERMS = [
     "policy", "mission", "MoU", "memorandum of understanding", "task force",
     "centre of excellence", "center of excellence", "budget", "governance", 
-    "advisory council", "regulation", "framework",
+    "advisory council", "regulation", "framework", "guidelines", "strategy",
+    "roadmap", "allocation", "funding", "pilot", "rollout",
+]
+
+AI_RELEVANCE_TERMS = [
+    "artificial intelligence", "machine learning", "deep learning", "genai",
+    "generative ai", "large language model", "llm", "computer vision",
+    "predictive analytics", "ai-driven", "ai powered", "intelligent automation",
+]
+
+POLICY_RELEVANCE_TERMS = [
+    "policy", "policies", "mission", "mou", "memorandum of understanding",
+    "task force", "centre of excellence", "center of excellence", "budget",
+    "governance", "advisory council", "regulation", "regulatory", "framework",
+    "guideline", "guidelines", "strategy", "roadmap", "allocation", "funding",
+    "outlay", "notification", "cabinet approval", "pilot", "rollout",
 ]
 
 CATEGORY_KEYWORDS = {
@@ -94,13 +112,22 @@ def fetch_articles_for_state(state, api_key, days, page_size, session, cache_dir
 
 # Step 3 - Relevance
 
-def looks_relevant(article, state):
+def looks_relevant(article, state, reject_counts=None):
     text = f"{article.get('title') or ''} {article.get('description') or ''}".lower()
-    if state.lower() not in text and not any(a.lower() in text for a in STATES[state]["aliases"]):
-       return False
-    has_ai = "ai" in re.findall(r"\b\w+\b", text) or "artificial intelligence" in text
-    has_policy_word = any(term.split()[0] in text for term in POLICY_TERMS)
-    return has_ai and has_policy_word
+    has_state = state.lower() in text or any(a.lower() in text for a in STATES[state]["aliases"])
+    has_ai = "ai" in re.findall(r"\b\w+\b", text) or any(term in text for term in AI_RELEVANCE_TERMS)
+    has_policy = any(term in text for term in POLICY_RELEVANCE_TERMS)
+
+    is_relevant = has_state and has_ai and has_policy
+    if not is_relevant and reject_counts is not None:
+        if not has_state:
+            reject_counts["state_missing"] += 1
+        if not has_ai:
+            reject_counts["ai_missing"] += 1
+        if not has_policy:
+            reject_counts["policy_missing"] += 1
+
+    return is_relevant
 
 # STep 4 - Deduplication
 
@@ -175,12 +202,12 @@ def main():
    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
    parser.add_argument("--api-key", default="b09703ce22f64473b9791508a66765f2",
                     help="NewsAPI key")
-   parser.add_argument("--days", type=int, default=90,
+   parser.add_argument("--days", type=int, default=30,
                         help="How many days back to search (free tier caps this at ~30)")
    parser.add_argument("--page-size", type=int, default=50, help="Max articles per state query (NewsAPI max 100)")
    parser.add_argument("--states", nargs="*", default=list(STATES.keys()),
                         help="Subset of states to fetch, e.g. --states Telangana Karnataka")
-   parser.add_argument("--out", default=os.path.join(os.path.dirname(__file__), "..", "data", "ai_policy_india_auto.csv"))
+   parser.add_argument("--out", default=os.path.join(os.path.dirname(__file__), "..", "data", "ai_policy_india.csv"))
    parser.add_argument("--cache-dir", default=os.path.join(os.path.dirname(__file__), "..", "data", "raw"))
    args = parser.parse_args()
 
@@ -201,8 +228,17 @@ def main():
            continue
        print(f"Fetching: {state} ...")
        articles = fetch_articles_for_state(state, args.api_key, args.days, args.page_size, session, args.cache_dir)
-       relevant = [a for a in articles if looks_relevant(a, state)]
+       reject_counts = {"state_missing": 0, "ai_missing": 0, "policy_missing": 0}
+       relevant = [a for a in articles if looks_relevant(a, state, reject_counts=reject_counts)]
        print(f"  {len(articles)} articles fetched, {len(relevant)} passed the relevance filter")
+       rejected = len(articles) - len(relevant)
+       if rejected:
+           print(
+               "  relevance rejects -> "
+               f"state missing: {reject_counts['state_missing']}, "
+               f"ai missing: {reject_counts['ai_missing']}, "
+               f"policy missing: {reject_counts['policy_missing']}"
+           )
 
        clusters = dedupe(relevant)
        print(f"  {len(clusters)} clusters after dedup")
