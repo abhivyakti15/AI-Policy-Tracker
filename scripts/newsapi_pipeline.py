@@ -49,7 +49,7 @@ CATEGORY_KEYWORDS = {
 }
 
 STATE_ALIASES_LOOKUP = {
-    alias.lowe(): canonical
+    alias.lower(): canonical
     for canonical, info in STATES.items()
     for alias in info["aliases"] + [canonical]
 }
@@ -60,7 +60,7 @@ def fetch_articles_for_state(state, api_key, days, page_size, session, cache_dir
     import requests 
 
     query = f'({state}) AND ({" OR ".join(AI_TERMS)}) AND ({" OR ".join(POLICY_TERMS)})'
-    from_date = (datetime.now(timezone.utc)) - timedelta(days=days).strftime("%Y-%m-%d")
+    from_date = (datetime.now(timezone.utc) - timedelta(days=days)).strftime("%Y-%m-%d")
 
     cache_key = re.sub(r"\W+", "_", state.lower())
     cache_path = os.path.join(cache_dir, f"{cache_key}_{from_date}.json")
@@ -173,8 +173,8 @@ def normalize_cluster(cluster, state):
 
 def main():
    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-   parser.add_argument("--api-key", default=os.environ.get("NEWSAPI_KEY"),
-                        help="NewsAPI key (or set NEWSAPI_KEY env var)")
+   parser.add_argument("--api-key", default="b09703ce22f64473b9791508a66765f2",
+                    help="NewsAPI key")
    parser.add_argument("--days", type=int, default=30,
                         help="How many days back to search (free tier caps this at ~30)")
    parser.add_argument("--page-size", type=int, default=50, help="Max articles per state query (NewsAPI max 100)")
